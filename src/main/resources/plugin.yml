@@ -1,0 +1,11 @@
+name: BarrelsTerminal
+version: ${project.version}
+main: com.gmail.nudoing.spigot.barrelsterminal.BarrelsTerminal
+api-version: 1.13
+author: Nudon
+website: https://www.youtube.com/user/nudoing/
+
+commands:
+  BTHelp:
+    description: BarrelTerminal help
+
