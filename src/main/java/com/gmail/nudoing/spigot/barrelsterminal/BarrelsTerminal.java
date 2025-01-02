@@ -221,7 +221,7 @@ public final class BarrelsTerminal extends JavaPlugin implements Listener {
     //ターミナルたるがくりっくされたときの処理
     private void func_terminal(@NotNull InventoryClickEvent e,Barrel terminal){
 
-        if(isEmpty(e.getCursor()) && !isEmpty(e.getCurrentItem()) && getInvSide(e) == InvSide.PLAYER && e.getClick() == ClickType.MIDDLE){
+        if(isEmpty(e.getCursor()) && !isEmpty(e.getCurrentItem()) && getInvSide(e) == InvSide.PLAYER && e.getClick() == ClickType.SHIFT_RIGHT){
             //マウスカーソルがカラ、カレントます目にアイテムが有り、プレイヤー側インベントリが中央クリックされた場合。
             // 検索開始
             ArrayList<Barrel> barrels = searchBarrels(terminal);
@@ -602,8 +602,8 @@ public final class BarrelsTerminal extends JavaPlugin implements Listener {
 
     //ななしたるがクリックされたときの処理
     private void func_noNameBarrel(@NotNull InventoryClickEvent e,Barrel barrel){
-        if(use_filled_barrel && e.getClick() == ClickType.MIDDLE){
-            //中身入りたるも空きたるとして使用するモードでマウス中央クリックだったら！
+        if(use_filled_barrel && e.getClick() == ClickType.SHIFT_RIGHT){
+            //中身入りたるも空きたるとして使用するモードでマウスSHIFT_RIGHTだったら！
             if(!isEmpty(barrel) && isEmpty(e.getCursor())){
                 //中身入り＆カーソルにアイテムなしだったら！
                 ItemStack itemStack = e.getCurrentItem();
