@@ -9,8 +9,5 @@
         <module name="BarrelsTerminal" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="BarrelsTerminal" target="1.8" />
-    </bytecodeTargetLevel>
   </component>
 </project>
