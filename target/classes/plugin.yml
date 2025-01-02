@@ -1,5 +1,5 @@
 name: BarrelsTerminal
-version: 2.1
+version: 2.101
 main: com.gmail.nudoing.spigot.barrelsterminal.BarrelsTerminal
 api-version: 1.13
 author: Nudon

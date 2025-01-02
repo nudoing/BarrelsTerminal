@@ -311,26 +311,22 @@ public final class BarrelsTerminal extends JavaPlugin implements Listener {
                         }
 
                     }
-                }else{
-                    //全部だす
-                    player.sendMessage("=== ALL Storage & Filter List ===");
-                    storageList = getTypeList(barrels,STORAGE);
-                    storageList.addAll(getTypeList(barrels,FILTER));
-                }
 
-                ArrayList<String> str_barrel_name = new ArrayList<>();
-                for(Barrel barrel:storageList){
-                    String s = barrel.getCustomName();
-                    if(s != null && !s.isEmpty()){
-                        str_barrel_name.add(s);
+                    ArrayList<String> str_barrel_name = new ArrayList<>();
+                    for(Barrel barrel:storageList){
+                        String s = barrel.getCustomName();
+                        if(s != null && !s.isEmpty()){
+                            str_barrel_name.add(s);
+                        }
                     }
+                    // 重複名を消す。
+                    ArrayList<String> hash_set = new ArrayList<>(new HashSet<>(str_barrel_name));
+                    for(String s:hash_set){
+                        player.sendMessage(s);
+                    }
+                    player.sendMessage(hash_set.size() +" type  " + str_barrel_name.size() +" storage");
+
                 }
-                // 重複名を消す。
-                ArrayList<String> hash_set = new ArrayList<>(new HashSet<>(str_barrel_name));
-                for(String s:hash_set){
-                    player.sendMessage(s);
-                }
-                player.sendMessage(hash_set.size() +" type  " + str_barrel_name.size() +" storage");
 
             }
         }else{
