@@ -212,7 +212,7 @@ public final class BarrelsTerminal extends JavaPlugin implements Listener {
         if(getBarrelType(barrel).equals(MENU)){
             Set<Integer> set = e.getRawSlots();
             set.removeIf(s -> (s > 27));
-            if(set.size() > 0) e.setCancelled(true);
+            if(!set.isEmpty()) e.setCancelled(true);
         }
 
     }
@@ -247,7 +247,7 @@ public final class BarrelsTerminal extends JavaPlugin implements Listener {
 
         String groupName = getGroupName(terminal);
         // ターミナルにグループ名付いてなかったら……
-        if(groupName.equals("")){
+        if(groupName.isEmpty()){
             setName(terminal,TERMINAL + " " + terminal.getX() + "," + terminal.getY() + "," + terminal.getZ());
             openBarrel(player,terminal);
             e.setCancelled(true);
@@ -300,7 +300,7 @@ public final class BarrelsTerminal extends JavaPlugin implements Listener {
                     //外側クリックなら、MENU登録ないのだけ出す
                     player.sendMessage("=== No on the menu list ===");
                     storageList = getStorageListNoMenu(barrels);
-                    if(storageList.size() > 0){
+                    if(!storageList.isEmpty()){
                         openBarrel(player,get0Barrel(storageList));
                     }else{
                         if(use_filled_barrel){
@@ -321,7 +321,7 @@ public final class BarrelsTerminal extends JavaPlugin implements Listener {
                 ArrayList<String> str_barrel_name = new ArrayList<>();
                 for(Barrel barrel:storageList){
                     String s = barrel.getCustomName();
-                    if(s != null && !s.equals("")){
+                    if(s != null && !s.isEmpty()){
                         str_barrel_name.add(s);
                     }
                 }
@@ -385,7 +385,7 @@ public final class BarrelsTerminal extends JavaPlugin implements Listener {
                     Inventory target_inv = target.getInventory();
 
                     for(int i = 0; i < terminal_items.length; i++){
-                        if(str_match_barrel_name[i] != null && !str_match_barrel_name[i].equals("") && str_match_barrel_name[i].equals(target_name) && terminal_items[i] != null && terminal_items[i].getType() != Material.AIR){
+                        if(str_match_barrel_name[i] != null && !str_match_barrel_name[i].isEmpty() && str_match_barrel_name[i].equals(target_name) && terminal_items[i] != null && terminal_items[i].getType() != Material.AIR){
                             // 同じ名前なら、このたるに入れる！
                             HashMap<Integer,ItemStack> hash = target_inv.addItem(terminal_items[i]);
                             //のこりは戻す
@@ -407,13 +407,13 @@ public final class BarrelsTerminal extends JavaPlugin implements Listener {
                     for(int i=0;i < terminal_items.length; i++){
                         if(terminal_items[i] != null && terminal_items[i].getType() != Material.AIR){
                             //はみでてるアイテムの入るべきたるの名前を確認。
-                            if( str_match_barrel_name[i] != null && !str_match_barrel_name[i].equals(""))
-                            str_overflow_barrel_name.add(str_match_barrel_name[i]);
+                            if( str_match_barrel_name[i] != null && !str_match_barrel_name[i].isEmpty())
+                                str_overflow_barrel_name.add(str_match_barrel_name[i]);
                         }
                     }
 
                     //入り切らなかったたるがあったら、新しくたるを作る。
-                    if(str_overflow_barrel_name.size() >= 1){
+                    if(!str_overflow_barrel_name.isEmpty()){
                         // OUTSIDEをクリック。
                         ArrayList<String> hash_set = new ArrayList<>(new HashSet<>(str_overflow_barrel_name));
                         for(String name:hash_set){
@@ -427,7 +427,7 @@ public final class BarrelsTerminal extends JavaPlugin implements Listener {
                         openBarrel(player,get0Barrel(getTypeList(barrels,MENU)));
                     }else{
                         //OUTSIDE以外をクリック。なんらかの理由でアイテムがしまいきれない。
-                        if(str_overflow_barrel_name.size() == 0){
+                        if(str_overflow_barrel_name.isEmpty()){
                             if(japanese)
                                 player.sendMessage("どこに入れたらいいか、わかんないアイテムがあります。");
                             else
@@ -551,7 +551,7 @@ public final class BarrelsTerminal extends JavaPlugin implements Listener {
 
         // グループに所属していないたるは、処理しません。
         String groupName = getGroupName(barrel);
-        if(groupName.equals(""))
+        if(groupName.isEmpty())
             return;
 
         //クリックしたひと
@@ -712,7 +712,7 @@ public final class BarrelsTerminal extends JavaPlugin implements Listener {
     @NotNull private ArrayList<Barrel> getNamedList(ArrayList<Barrel> barrels, String name){
         ArrayList<Barrel> result = new ArrayList<>();
         //名前がnullなら、カラ配列返しちゃう
-        if(name == null || name.equals("")) return result;
+        if(name == null || name.isEmpty()) return result;
 
         //同じ名前のをリザルトに入れてく
         for(Barrel b:barrels){
@@ -724,7 +724,7 @@ public final class BarrelsTerminal extends JavaPlugin implements Listener {
     }
 
     private Barrel get0Barrel(ArrayList<Barrel> barrels){
-        if(barrels.size() == 0) return null;
+        if(barrels.isEmpty()) return null;
         return barrels.get(0);
     }
 
@@ -761,7 +761,7 @@ public final class BarrelsTerminal extends JavaPlugin implements Listener {
 
                                 if(name == null){
                                     //name=nullなら空きたるかどうかをチェック。空きたるならそれを返す。
-                                    if(b.getCustomName() == null || b.getCustomName().equals("")){
+                                    if(b.getCustomName() == null || b.getCustomName().isEmpty()){
                                         //ルートテーブルが設定されてなかったら、自由に使ってもいいよね？
                                         if(b.getLootTable() == null){
                                             boolean emp = isEmpty(b);
@@ -854,7 +854,7 @@ public final class BarrelsTerminal extends JavaPlugin implements Listener {
 
     //とくていのたるグループに、新しくなまえつきのたるをつくる
     private Barrel createNewPage(@NotNull Player player, Barrel terminal, String name){
-        if(name == null || name.equals(""))
+        if(name == null || name.isEmpty())
             return null;
 
         if(terminal == null) return null;   //ターミナルなし。
@@ -931,7 +931,7 @@ public final class BarrelsTerminal extends JavaPlugin implements Listener {
         //グループ名
         String groupName = getGroupName(barrel);
         //なしならnull返す
-        if(groupName.equals("")) return null;
+        if(groupName.isEmpty()) return null;
 
         //ターミナルたるの名前
         String terminalName = TERMINAL + " " + groupName;
@@ -949,7 +949,7 @@ public final class BarrelsTerminal extends JavaPlugin implements Listener {
         //グループ名
         String groupName = getGroupName(terminal);
         //なしならnull返す
-        if(groupName.equals("")) return null;
+        if(groupName.isEmpty()) return null;
         //メニューたるの名前
         String menuName = MENU + " " + groupName;
         //さいしょにみつけたメニューたるを返す。（見つからなければnull）
@@ -967,7 +967,7 @@ public final class BarrelsTerminal extends JavaPlugin implements Listener {
         // グループ名ゲット
         String groupName = getGroupName(terminal);
         // グループ名なしなら帰る。
-        if(groupName.equals("")) return barrelList;
+        if(groupName.isEmpty()) return barrelList;
 
         int centerX,centerZ,centerY;
         int minX,minZ,minY,maxX,maxZ,maxY;
@@ -1011,7 +1011,7 @@ public final class BarrelsTerminal extends JavaPlugin implements Listener {
     // たるからグループ名をぬきだす。(なければ""を返す。)
     private String getGroupName(Barrel barrel){
         // 名無したるならリストなし。
-        if(barrel == null || barrel.getCustomName() == null || barrel.getCustomName().equals(""))
+        if(barrel == null || barrel.getCustomName() == null || barrel.getCustomName().isEmpty())
             return "";
         String[] args = barrel.getCustomName().split(" ");
         if(args.length <= 1)
@@ -1091,7 +1091,7 @@ public final class BarrelsTerminal extends JavaPlugin implements Listener {
     //たるの種類を返す。
     private String getBarrelType(Barrel barrel){
         // 名無したるならリストなし。
-        if(barrel.getCustomName() == null || barrel.getCustomName().equals(""))
+        if(barrel.getCustomName() == null || barrel.getCustomName().isEmpty())
             return NONE;
         String[] args = barrel.getCustomName().split(" ");
 
