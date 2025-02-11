@@ -224,7 +224,7 @@ public final class BarrelsTerminal extends JavaPlugin implements Listener {
         if(isEmpty(e.getCursor()) && !isEmpty(e.getCurrentItem()) && getInvSide(e) == InvSide.PLAYER
                 && (e.getClick() == ClickType.SHIFT_RIGHT || e.getClick() == ClickType.MIDDLE || (e.getClick()==ClickType.NUMBER_KEY && e.getHotbarButton() == 0))){
             //マウスカーソルがカラ、カレントます目にアイテムが有り、プレイヤー側インベントリが中央クリックされた場合。
-            // 検索開始
+            //検索開始
             ArrayList<Barrel> barrels = searchBarrels(terminal);
 
             //MENUで指定したしまい込みmapを取得
