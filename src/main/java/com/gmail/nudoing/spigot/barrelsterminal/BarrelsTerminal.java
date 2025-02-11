@@ -221,15 +221,16 @@ public final class BarrelsTerminal extends JavaPlugin implements Listener {
     //ターミナルたるがくりっくされたときの処理
     private void func_terminal(@NotNull InventoryClickEvent e,Barrel terminal){
 
-        if(isEmpty(e.getCursor()) && !isEmpty(e.getCurrentItem()) && getInvSide(e) == InvSide.PLAYER && e.getClick() == ClickType.SHIFT_RIGHT){
+        if(isEmpty(e.getCursor()) && !isEmpty(e.getCurrentItem()) && getInvSide(e) == InvSide.PLAYER
+                && (e.getClick() == ClickType.SHIFT_RIGHT || e.getClick() == ClickType.MIDDLE || (e.getClick()==ClickType.NUMBER_KEY && e.getHotbarButton() == 0))){
             //マウスカーソルがカラ、カレントます目にアイテムが有り、プレイヤー側インベントリが中央クリックされた場合。
             // 検索開始
             ArrayList<Barrel> barrels = searchBarrels(terminal);
 
             //MENUで指定したしまい込みmapを取得
-            HashMap<Material,String> mapMaterialToStorageName = getMapMaterialToStorageName(barrels);
+            HashMap<String,String> mapMaterialToStorageName = getMapMaterialToStorageName(barrels);
 
-            String storageName = mapMaterialToStorageName.get(e.getCurrentItem().getType());
+            String storageName = mapMaterialToStorageName.get(getName(e.getCurrentItem()));
             Player player = (Player)e.getWhoClicked();
             // カーソルがあってるアイテムをしまうべき箱を開ける
             openBarrel(player,get0Barrel(getNamedList(barrels,storageName)));
@@ -344,7 +345,7 @@ public final class BarrelsTerminal extends JavaPlugin implements Listener {
                 String[] str_match_barrel_name = new String[terminal_items.length];
 
                 //MENUで指定したしまい込みmapを取得
-                HashMap<Material,String> mapMaterialToStorageName = getMapMaterialToStorageName(barrels);
+                HashMap<String,String> mapMaterialToStorageName = getMapMaterialToStorageName(barrels);
                 // 所属たるのリストを取得
                 ArrayList<Barrel> storageList = getTypeList(barrels,STORAGE);
 
@@ -354,7 +355,7 @@ public final class BarrelsTerminal extends JavaPlugin implements Listener {
                         //カラじゃないスタックを処理する
                         str_match_barrel_name[i] = "";
                         // mapを検索
-                        String storageName = mapMaterialToStorageName.get(terminal_items[i].getType());
+                        String storageName = mapMaterialToStorageName.get(getName(terminal_items[i]));
                         if(storageName != null){
                             //mapに値があったので、それをマッチネームに設定！
                             str_match_barrel_name[i] = storageName;
@@ -399,14 +400,7 @@ public final class BarrelsTerminal extends JavaPlugin implements Listener {
                 //ターミナルにまだアイテムが残っている場合……
                 if(!isEmpty(terminal)){
                     //入り切らなかったたるの名前
-                    ArrayList<String> str_overflow_barrel_name = new ArrayList<>();
-                    for(int i=0;i < terminal_items.length; i++){
-                        if(terminal_items[i] != null && terminal_items[i].getType() != Material.AIR){
-                            //はみでてるアイテムの入るべきたるの名前を確認。
-                            if( str_match_barrel_name[i] != null && !str_match_barrel_name[i].isEmpty())
-                                str_overflow_barrel_name.add(str_match_barrel_name[i]);
-                        }
-                    }
+                    ArrayList<String> str_overflow_barrel_name = getOverflowBarrelName(terminal_items, str_match_barrel_name);
 
                     //入り切らなかったたるがあったら、新しくたるを作る。
                     if(!str_overflow_barrel_name.isEmpty()){
@@ -438,6 +432,20 @@ public final class BarrelsTerminal extends JavaPlugin implements Listener {
         }
 
 
+    }
+
+
+    @NotNull
+    private static ArrayList<String> getOverflowBarrelName(ItemStack[] terminal_items, String[] str_match_barrel_name) {
+        ArrayList<String> str_overflow_barrel_name = new ArrayList<>();
+        for(int i = 0; i < terminal_items.length; i++){
+            if(terminal_items[i] != null && terminal_items[i].getType() != Material.AIR){
+                //はみでてるアイテムの入るべきたるの名前を確認。
+                if( str_match_barrel_name[i] != null && !str_match_barrel_name[i].isEmpty())
+                    str_overflow_barrel_name.add(str_match_barrel_name[i]);
+            }
+        }
+        return str_overflow_barrel_name;
     }
 
     //メニューたるがクリックされたときの処理
@@ -530,6 +538,7 @@ public final class BarrelsTerminal extends JavaPlugin implements Listener {
         if(!bMouseEmpty && !bCurrentEmpty){
             e.setCancelled(true);
         }
+
         //右クリ以外はそもそも禁止。
         if(e.getClick() != ClickType.RIGHT)
             e.setCancelled(true);
@@ -680,10 +689,12 @@ public final class BarrelsTerminal extends JavaPlugin implements Listener {
 
     //リストを渡すと、MENUにないストレージのリストをくれる。
     private ArrayList<Barrel> getStorageListNoMenu(ArrayList<Barrel> barrels){
-        // 所属たるのストレージリストを取得
+        // 所属たるのストレージ/フィルターのリストを取得
         ArrayList<Barrel> storageList = getTypeList(barrels,STORAGE);
+        storageList.addAll(getTypeList(barrels,FILTER));
+
         // 入れるところmapを取得
-        HashMap<Material,String> map = getMenuItemListWithOutTypeName(barrels,MENU);
+        HashMap<String,String> map = getMenuItemListWithOutTypeName(barrels,MENU);
         // 重複しているストレージ名を消したものを取得。
         //Set<Material> set = map.keySet();
 
@@ -1029,22 +1040,28 @@ public final class BarrelsTerminal extends JavaPlugin implements Listener {
     }
 
     //メニューなどをチェックして、どのアイテムをどこに入れればいいかの一覧を返す。
-    private HashMap<Material,String> getMapMaterialToStorageName(ArrayList<Barrel> barrels){
+    private HashMap<String,String> getMapMaterialToStorageName(ArrayList<Barrel> barrels){
 
         //FILTERのアイテムを調査
-        HashMap<Material,String> map = getMenuItemListWithOutTypeName(barrels,FILTER);
+        HashMap<String,String> map = getMenuItemListWithOutTypeName(barrels,FILTER);
         //MENUのアイテムを調査
         map.putAll(getMenuItemListWithOutTypeName(barrels,MENU));
 
-        Set<Material> set = map.keySet();
-        for(Material m:set){
-            map.put(m,STORAGE + map.get(m));
+        Set<String> set = map.keySet();
+        for(String s:set){
+            map.put(s,STORAGE + map.get(s));
         }
         return map;
     }
 
-    private HashMap<Material,String> getMenuItemListWithOutTypeName(ArrayList<Barrel> barrels,String barrelType){
-        HashMap<Material,String> map = new HashMap<>();
+    /**
+     *
+     * @param barrels 処理対象のたる
+     * @param barrelType 処理するたるたいぷ（MENU\FILTER)
+     * @return <アイテム名,入れる項目名> のmap
+     */
+    private HashMap<String,String> getMenuItemListWithOutTypeName(ArrayList<Barrel> barrels,String barrelType){
+        HashMap<String,String> map = new HashMap<>();
 
         //MENUに設定したアイテムの入れるところ
         ArrayList<Barrel> listMenu = getTypeList(barrels,barrelType);
@@ -1056,14 +1073,14 @@ public final class BarrelsTerminal extends JavaPlugin implements Listener {
                     switch (barrelType){
                         case MENU:
                             String s = " " + groupName + " " + getName(i);
-                            map.put(i.getType(),s);
+                            map.put(getName(i),s);
                             break;
                         case FILTER:
                             //FILTERな事を確認済なので、ぬるぽしない。
                             String[] ss = Objects.requireNonNull(b.getCustomName()).split(" ");
                             ss[0] = "";
                             String name = String.join(" ",ss);
-                            map.put(i.getType(),name);
+                            map.put(getName(i),name);
                             break;
                     }
                 }
